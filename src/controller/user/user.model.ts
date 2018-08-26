@@ -9,6 +9,7 @@ export interface IUserModel extends Document {
   language: string;
   nickName: string;
   province: string;
+  currentBook: string;
   create_at: Date;
   update_at: Date;
 }
@@ -38,6 +39,10 @@ const schema = new Schema({
   },
   province: {
     type: String
+  },
+  currentBook: {
+    type: String,
+    ref: 'Book'
   },
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now }

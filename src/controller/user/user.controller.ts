@@ -37,7 +37,10 @@ export async function login(ctx: IRouterCtx) {
 
 export async function show(ctx: IRouterCtx) {
   const { id } = ctx.user;
-  const user = await UserModel.findById(id).exec();
+  const user = await UserModel
+    .findById(id)
+    .populate({ path: 'currentBook' })
+    .exec();
   if (!user) {
     throwNotFound();
   }
@@ -46,8 +49,11 @@ export async function show(ctx: IRouterCtx) {
 
 export async function update(ctx: IRouterCtx) {
   const { id } = ctx.user;
-  const body = omit(ctx.request.body, ['_openId', '_id']);
-  const user = await UserModel.findByIdAndUpdate(id, body, { new: true, runValidators: true }).exec();
+  const body = omit(ctx.request.body, ['_openId', '_id', 'create_at', 'update_at']);
+  const user = await UserModel
+    .findByIdAndUpdate(id, body, { new: true, runValidators: true })
+    .populate({ path: 'currentBook' })
+    .exec();
   if (!user) {
     throwNotFound();
   }
