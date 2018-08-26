@@ -2,7 +2,7 @@ import { IUserModel } from '../user/user.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
 import { BookModel } from './book.model';
 import { pick } from 'lodash';
-import { getPaginationMeta, responseSuccess, throwCommonError, throwForbidden } from '../../utils/handle-response';
+import { getPaginationMeta, responseSuccess, throwCommonError, throwForbidden, throwNotFound } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
   const { id } = ctx.user;
@@ -42,9 +42,30 @@ export async function update(ctx: IRouterCtx) {
   responseSuccess(ctx, { data: Object.assign({}, book.toObject(), updateBody) });
 }
 
+export async function getJoin(ctx: IRouterCtx) {
+  const { bookId } = ctx.params;
+  const data = await BookModel
+    .findById(bookId)
+    .populate({ path: 'users', select: ['avatarUrl', 'nickName', '_id'] })
+    .populate({ path: 'create_user', select: ['avatarUrl', 'nickName', '_id'] })
+    .exec();
+
+  if (!data) {
+    throwNotFound();
+  }
+  responseSuccess(ctx, { data });
+}
+
 export async function join(ctx: IRouterCtx) {
   const { id: userId } = ctx.user;
-  const book = ctx.book;
+  const { bookId } = ctx.params;
+  const book = await BookModel
+    .findById(bookId)
+    .populate({ path: 'users' })
+    .populate({ path: 'create_user' });
+  if (!book) {
+    return throwNotFound();
+  }
   const users = (book.users as IUserModel[]).map(userObj => userObj._id);
   const user = users.find(user => String(user) === String(userId));
   if (user) {

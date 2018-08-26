@@ -25,7 +25,7 @@ export async function create(ctx: IRouterCtx) {
   const book = ctx.book;
   const body: any = pick(ctx.request.body, ['name', 'remark', 'amount', 'color']);
   body.book = book._id;
-  const budget = new BudgetModel(body).save();
+  const budget = await new BudgetModel(body).save();
   responseSuccess(ctx, { data: budget });
 }
 
