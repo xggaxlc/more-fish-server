@@ -1,0 +1,21 @@
+const { NODE_ENV, PORT = 4000, IP = '0.0.0.0' } = process.env;
+import { merge } from 'lodash';
+
+export const config = merge({
+  env: NODE_ENV,
+  port: PORT,
+  ip: IP,
+  mongo: {
+    options: {
+      useNewUrlParser: true
+    }
+  },
+  appid: '',
+  secrets: {
+    jwt: 'this_is_my_jwt_secret'
+  },
+  jwtExpires: '7d',
+  pagination: {
+    limit: 20
+  }
+}, require(`./${NODE_ENV}.js`).default);
