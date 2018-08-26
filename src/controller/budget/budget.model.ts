@@ -9,6 +9,8 @@ export interface IBudgetModel extends Document {
   amount: number;
   color: string;
   book: IBookModel | string;
+  start_at: Date,
+  end_at: Date,
   create_at: Date,
   update_at: Date
 }
@@ -19,6 +21,8 @@ const schema = new Schema({
   amount: { type: Number, required: [true, 'amount 必填'] },
   color: { type: String, default: '#FA4444', required: [true, 'color 必填'] },
   book: { type: ObjectId, ref: 'Book' },
+  start_at: { type: Date } ,
+  end_at: { type: Date },
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now }
 });
