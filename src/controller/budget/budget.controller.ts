@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 import { BudgetModel } from './budget.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
-import { responseSuccess, throwNotFound } from '../helper/handle-response';
+import { responseSuccess, throwNotFound } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;

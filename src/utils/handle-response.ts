@@ -1,5 +1,5 @@
-import { IResponse } from './../../interface/IResponse';
-import { IRouterCtx } from './../../interface/IRouterCtx';
+import { IRouterCtx } from "../interface/IRouterCtx";
+import { IResponse } from "../interface/IResponse";
 
 export function throwNotFound(message = '资源不存在') {
   throw { status: 404, message };

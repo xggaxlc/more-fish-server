@@ -1,6 +1,6 @@
 import { IRouterCtx } from './../interface/IRouterCtx';
 import { IUserModel } from '../controller/user/user.model';
-import { throwForbidden } from '../controller/helper/handle-response';
+import { throwForbidden } from '../utils/handle-response';
 
 export async function checkUserIsBookCreator(ctx: IRouterCtx, next: () => Promise<any>) {
   const book = ctx.book;

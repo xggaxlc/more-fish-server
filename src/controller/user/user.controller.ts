@@ -2,9 +2,9 @@ import { createToken } from './../../utils/jwt';
 import { IRouterCtx } from '../../interface/IRouterCtx';
 import * as request from 'superagent';
 import { config } from '../../config';
-import { throwCommonError, responseSuccess, throwNotFound } from '../helper/handle-response';
 import { UserModel } from './user.model';
 import { omit } from 'lodash';
+import { throwCommonError, responseSuccess, throwNotFound } from '../../utils/handle-response';
 
 export async function login(ctx: IRouterCtx) {
   const { code } = ctx.request.body as any;

@@ -1,8 +1,8 @@
 import { IUserModel } from '../user/user.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
 import { BookModel } from './book.model';
-import { responseSuccess, getPaginationMeta, throwForbidden, throwCommonError } from '../helper/handle-response';
 import { pick } from 'lodash';
+import { getPaginationMeta, responseSuccess, throwCommonError, throwForbidden } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
   const { id } = ctx.user;

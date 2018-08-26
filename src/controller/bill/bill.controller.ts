@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 import { BillModel } from './bill.model';
 import { IRouterCtx } from '../../interface/IRouterCtx';
-import { getPaginationMeta, responseSuccess, throwNotFound, throwCommonError } from '../helper/handle-response';
+import { getPaginationMeta, responseSuccess, throwNotFound } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
   const { id } = ctx.user;

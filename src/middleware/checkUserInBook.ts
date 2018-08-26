@@ -1,6 +1,6 @@
 import { IRouterCtx } from '../interface/IRouterCtx';
 import { BookModel } from '../controller/book/book.model';
-import { throwNotFound, throwForbidden } from '../controller/helper/handle-response';
+import { throwNotFound, throwForbidden } from '../utils/handle-response';
 import { IUserModel } from '../controller/user/user.model';
 
 export async function checkUserInBook(ctx: IRouterCtx, next: () => Promise<any>) {
