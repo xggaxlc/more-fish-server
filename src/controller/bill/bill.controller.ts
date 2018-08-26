@@ -1,15 +1,19 @@
+import { UserModel } from './../user/user.model';
 import { pick } from 'lodash';
-import { BillModel } from './bill.model';
+import { BillModel, IBillModel } from './bill.model';
 import { IRouterCtx } from '../../interface/IRouterCtx';
 import { getPaginationMeta, responseSuccess, throwNotFound } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
-  const { id } = ctx.user;
-  const query: any = { users: id };
+  const { bookId } = ctx.params;
+  const query: any = { book: bookId };
   const { limit, skip } = ctx.pagination;
   const [data, count] = await Promise.all([
     BillModel
       .find(query)
+      .populate({ path: 'budget' })
+      .populate({ path: 'create_user' })
+      .sort('-_id')
       .limit(limit)
       .skip(skip),
     BillModel.countDocuments(query)
@@ -20,9 +24,8 @@ export async function index(ctx: IRouterCtx) {
 
 export async function show(ctx: IRouterCtx) {
   const { id } = ctx.params;
-  const data = BillModel
+  const data = await BillModel
     .findById(id)
-    .populate({ path: 'book' })
     .populate({ path: 'budget' })
     .populate({ path: 'create_user' })
     .exec();
@@ -36,14 +39,23 @@ export async function create(ctx: IRouterCtx) {
   const body: any = pick(ctx.request.body, ['amount', 'time', 'remark', 'budget']);
   body.book = ctx.book._id;
   body.create_user = ctx.user.id;
-  const data = new BillModel(body).save();
+  const { _id } = await new BillModel(body).save();
+  const data = await BillModel
+    .findById(_id)
+    .populate({ path: 'budget' })
+    .populate({ path: 'create_user' })
+    .exec();
   responseSuccess(ctx, { data });
 }
 
 export async function update(ctx: IRouterCtx) {
   const { id } = ctx.params;
   const body: any = pick(ctx.request.body, ['amount', 'time', 'remark', 'budget']);
-  const data = await BillModel.findByIdAndUpdate(id, body, { new: true, runValidators: true }).exec();
+  const data = await BillModel
+    .findByIdAndUpdate(id, body, { new: true, runValidators: true })
+    .populate({ path: 'budget' })
+    .populate({ path: 'create_user' })
+    .exec();
   if (!data) {
     throwNotFound();
   }

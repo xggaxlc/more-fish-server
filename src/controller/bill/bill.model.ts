@@ -16,11 +16,11 @@ export interface IBillModel extends Document {
 }
 
 const schema = new Schema({
-  amount: { type: Number, required: [true, 'name 必填'] },
-  time: { type: Date, required: [true, 'name 必填'] },
+  amount: { type: Number, required: [true, 'amount 必填'] },
+  time: { type: Date, default: Date.now, required: [true, 'time 必填'] },
   remark: { type: String },
   book: { type: ObjectId, ref: 'Book' },
-  budget: { type: ObjectId, ref: 'budget' },
+  budget: { type: ObjectId, ref: 'Budget' },
   create_user: { type: ObjectId, ref: 'User' },
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now }
