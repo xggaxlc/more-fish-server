@@ -1,4 +1,4 @@
-const { NODE_ENV, PORT = 4000, IP = '0.0.0.0' } = process.env;
+const { NODE_ENV = 'development', PORT = 4000, IP = '0.0.0.0' } = process.env;
 import { merge } from 'lodash';
 
 export const config = merge({
@@ -11,9 +11,8 @@ export const config = merge({
     }
   },
   appid: '',
-  secrets: {
-    jwt: 'this_is_my_jwt_secret'
-  },
+  appSecret: '',
+  jwtSecret: '',
   jwtExpires: '7d',
   pagination: {
     limit: 20
