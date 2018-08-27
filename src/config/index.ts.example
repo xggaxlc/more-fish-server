@@ -1,7 +1,9 @@
+import { IConfig } from './../interface/IConfig';
+
 const { NODE_ENV = 'development', PORT = 4000, IP = '0.0.0.0' } = process.env;
 import { merge } from 'lodash';
 
-export const config = merge({
+export const config: IConfig = merge({
   env: NODE_ENV,
   port: PORT,
   ip: IP,
