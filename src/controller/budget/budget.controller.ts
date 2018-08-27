@@ -8,7 +8,7 @@ export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
   const {
     start_at = moment().startOf('month').toDate(),
-    end_at =  moment().endOf('month').toDate()
+    end_at = moment().endOf('month').toDate()
   } = ctx.query;
   const query = {
     book: bookId,

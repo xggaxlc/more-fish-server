@@ -1,25 +1,76 @@
-import { UserModel } from './../user/user.model';
 import { pick } from 'lodash';
-import { BillModel, IBillModel } from './bill.model';
+import { BillModel } from './bill.model';
 import { IRouterCtx } from '../../interface/IRouterCtx';
-import { getPaginationMeta, responseSuccess, throwNotFound } from '../../utils/handle-response';
+import { responseSuccess, throwNotFound } from '../../utils/handle-response';
+import { Types } from 'mongoose';
+import * as moment from 'moment';
+
+const ObjectId = Types.ObjectId;
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const query: any = { book: bookId };
-  const { limit, skip } = ctx.pagination;
-  const [data, count] = await Promise.all([
-    BillModel
-      .find(query)
-      .populate({ path: 'budget' })
-      .populate({ path: 'create_user' })
-      .sort('-_id')
-      .limit(limit)
-      .skip(skip),
-    BillModel.countDocuments(query)
+
+  const {
+    start_at = moment().startOf('month').toDate(),
+    end_at = moment().endOf('month').toDate()
+  } = ctx.query;
+
+  const query: any = {
+    book: ObjectId(bookId),
+    time: { $gte: start_at, $lte: end_at }
+  };
+
+  const data = await BillModel.aggregate([
+    {
+      $match: query,
+    },
+    {
+      $sort: { time: 1 },
+    },
+    {
+      $lookup: {
+        from: 'budgets',
+        localField: 'budget',
+        foreignField: '_id',
+        as: 'budget'
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'create_user',
+        foreignField: '_id',
+        as: 'create_user'
+      }
+    },
+    {
+      $group: {
+        _id: { year: { $year: "$time" }, month: { $month: "$time" }, day: { $dayOfMonth: "$time" } },
+        totalAmount: { $sum: '$amount' },
+        count: { $sum: 1 },
+        list: {
+          $push: '$$ROOT',
+        }
+      }
+    }
   ]);
-  const meta = getPaginationMeta(count, limit, skip);
-  responseSuccess(ctx, { data, meta });
+
+  const responseData = data.map(item => {
+    const { year, month, day } = item._id;
+    return {
+      ...item,
+      fromNow: moment().set({ year, month: month - 1, date: day }).fromNow(),
+      list: item.list.map((bill: any) => {
+        return {
+          ...bill,
+          budget: bill.budget[0],
+          create_user: bill.create_user[0]
+        }
+      })
+    }
+  });
+
+  responseSuccess(ctx, { data: responseData  });
 }
 
 export async function show(ctx: IRouterCtx) {

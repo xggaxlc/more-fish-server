@@ -3,6 +3,9 @@ import * as mongoose from 'mongoose';
 import * as cors from '@koa/cors';
 import { config } from './config';
 import router from './router';
+import * as moment from 'moment';
+
+moment.locale('zh-cn');
 
 const app = new Koa();
 app.use(cors());
