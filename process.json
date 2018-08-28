@@ -11,5 +11,5 @@
   "log_file": "log.log",
   "error_file": "error.log",
   "log_date_format": "YYYY-MM-DD HH:mm Z",
-  "watch": ["build/config","build/controller", "build/middleware", "build/utils", "build/router.js", "build/app.js"]
+  "watch": []
 }
