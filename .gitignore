@@ -2,4 +2,5 @@ node_modules/
 build/
 src/config/index.ts
 *.log
+process.json
 
