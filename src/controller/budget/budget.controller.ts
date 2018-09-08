@@ -4,21 +4,45 @@ import { IRouterCtx } from './../../interface/IRouterCtx';
 import { responseSuccess, throwNotFound } from '../../utils/handle-response';
 import * as moment from 'moment';
 
-export async function index(ctx: IRouterCtx) {
-  const { bookId } = ctx.params;
-  const {
-    start_at = moment().startOf('month').toDate(),
-    end_at = moment().endOf('month').toDate()
-  } = ctx.query;
+function queryBudget(bookId: string, start_at: Date, end_at: Date) {
   const query = {
     book: bookId,
     start_at,
     end_at
   }
-  const data = await BudgetModel
+  return BudgetModel
     .find(query)
     .exec();
-  responseSuccess(ctx, { data });
+}
+
+function createBudget(bookId: string, createBody: IBudgetModel) {
+  const body: IBudgetModel = pick(createBody, ['name', 'remark', 'amount', 'color']) as IBudgetModel;
+  body.book = bookId;
+  body.start_at = moment().startOf('month').toDate();
+  body.end_at = moment().endOf('month').toDate();
+  return new BudgetModel(body).save();
+}
+
+export async function index(ctx: IRouterCtx) {
+  const { bookId } = ctx.params;
+  const data = await queryBudget(
+    bookId,
+    moment().startOf('month').toDate(),
+    moment().endOf('month').toDate()
+  );
+
+  if (data.length) {
+    responseSuccess(ctx, { data });
+  } else {
+    const lastMonth = moment().startOf('month').add(-1, 'days');
+    const lastMonthData = await queryBudget(
+      bookId,
+      lastMonth.startOf('month').toDate(),
+      lastMonth.endOf('month').toDate()
+    );
+    const createdData = await Promise.all(lastMonthData.map(item => createBudget(bookId, item)));
+    responseSuccess(ctx, { data: createdData });
+  }
 }
 
 export async function show(ctx: IRouterCtx) {
@@ -37,9 +61,7 @@ export async function create(ctx: IRouterCtx) {
   const book = ctx.book;
   const body: IBudgetModel = pick(ctx.request.body, ['name', 'remark', 'amount', 'color']) as IBudgetModel;
   body.book = book._id;
-  body.start_at = moment().startOf('month').toDate();
-  body.end_at = moment().endOf('month').toDate();
-  const budget = await new BudgetModel(body).save();
+  const budget = await createBudget(book._id, body);
   responseSuccess(ctx, { data: budget });
 }
 
