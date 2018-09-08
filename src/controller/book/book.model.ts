@@ -5,10 +5,11 @@ const ObjectId = Schema.Types.ObjectId;
 export interface IBookModel extends Document {
   name: string;
   remark: string;
-  users: string[] | IUserModel[],
-  create_user: string | IUserModel,
-  create_at: Date,
-  update_at: Date
+  users: string[] | IUserModel[];
+  create_user: string | IUserModel;
+  color: string;
+  create_at: Date;
+  update_at: Date;
 }
 
 const schema = new Schema({
@@ -16,6 +17,7 @@ const schema = new Schema({
   remark: { type: String },
   users: [{ type: ObjectId, ref: 'User' }],
   create_user: { type: ObjectId, ref: 'User' },
+  color: { type: String, default: '#FF8308' },
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now }
 });
