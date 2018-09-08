@@ -1,5 +1,6 @@
 import { IRouterCtx } from "../interface/IRouterCtx";
 import { IResponse } from "../interface/IResponse";
+import * as moment from 'moment';
 
 export function throwNotFound(message = '资源不存在') {
   throw { status: 404, message };
@@ -14,6 +15,7 @@ export function throwCommonError(message: string) {
 }
 
 export function responseSuccess(ctx: IRouterCtx, body?: IResponse, status = 200) {
+  ctx.set('Timestamp', Date.now().toString());
   ctx.body = Object.assign({}, body, { success: true });
   ctx.status = status;
 }
