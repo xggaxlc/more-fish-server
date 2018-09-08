@@ -2,6 +2,7 @@ import * as userController from './controller/user/user.controller';
 import * as bookController from './controller/book/book.controller';
 import * as budgetController from './controller/budget/budget.controller';
 import * as billController from './controller/bill/bill.controller';
+import * as statController from './controller/stat/stat.controller';
 
 import { checkLogin } from './middleware/checkLogin';
 import { handleError } from './middleware/handleError';
@@ -21,7 +22,6 @@ export default (app: Koa) => {
   router.post('/users/login', userController.login);
 
   router.get('/books', checkLogin, pagination, bookController.index);
-
   router.get('/books/:bookId', checkLogin, checkUserInBook, bookController.show);
   router.post('/books', checkLogin, bookController.create);
   router.put('/books/:bookId', checkLogin, checkUserInBook, checkUserIsBookCreator, bookController.update);
@@ -36,11 +36,13 @@ export default (app: Koa) => {
   router.put('/books/:bookId/budgets/:id', checkLogin, checkUserInBook, checkUserIsBookCreator, budgetController.update);
   router.delete('/books/:bookId/budgets/:id', checkLogin, checkUserInBook, checkUserIsBookCreator, budgetController.destroy);
 
-  router.get('/books/:bookId/bills', checkLogin, checkUserInBook, billController.index);
+  router.get('/books/:bookId/bills', checkLogin, checkUserInBook, pagination, billController.index);
   router.get('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.show);
   router.post('/books/:bookId/bills', checkLogin, checkUserInBook, billController.create);
   router.put('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.update);
   router.delete('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.update);
+
+  router.get('/books/:bookId/stat/getAmountGroupByDay', checkLogin, checkUserInBook, statController.getAmountGroupByDay);
 
   app
     .use(handleError)
