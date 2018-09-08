@@ -7,7 +7,7 @@ import * as moment from 'moment';
 
 moment.locale('zh-cn');
 
-const app = new Koa();
+export const app = new Koa();
 app.use(cors());
 
 async function initMongo() {

@@ -61,12 +61,11 @@ export async function join(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
   const book = await BookModel
     .findById(bookId)
-    .populate({ path: 'users' })
     .populate({ path: 'create_user' });
   if (!book) {
     return throwNotFound();
   }
-  const users = (book.users as IUserModel[]).map(userObj => userObj._id);
+  const users = book.users as string[];
   const user = users.find(user => String(user) === String(userId));
   if (user) {
     throwCommonError('你已经在此账本中了');
