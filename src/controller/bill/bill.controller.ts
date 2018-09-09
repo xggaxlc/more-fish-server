@@ -10,6 +10,7 @@ export async function index(ctx: IRouterCtx) {
   const [data, count] = await Promise.all([
     BillModel
       .find(query)
+      .sort({ time: -1 })
       .limit(limit)
       .skip(skip)
       .populate({ path: 'budget' })
