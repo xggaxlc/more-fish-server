@@ -40,7 +40,7 @@ export default (app: Koa) => {
   router.get('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.show);
   router.post('/books/:bookId/bills', checkLogin, checkUserInBook, billController.create);
   router.put('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.update);
-  router.delete('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.update);
+  router.delete('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.destroy);
 
   router.get('/books/:bookId/stat/getAmountGroupByDay', checkLogin, checkUserInBook, statController.getAmountGroupByDay);
 
