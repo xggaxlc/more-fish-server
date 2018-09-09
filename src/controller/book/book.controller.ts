@@ -70,7 +70,7 @@ export async function join(ctx: IRouterCtx) {
   if (user) {
     throwCommonError('你已经在此账本中了');
   }
-  const updateBody = { users: users.push(userId) };
+  const updateBody = { users: users.concat([userId]) };
   await book.update(updateBody).exec();
   responseSuccess(ctx, { data: Object.assign({}, book.toObject(), updateBody) });
 }
