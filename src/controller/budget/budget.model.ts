@@ -28,3 +28,10 @@ const schema = new Schema({
 });
 
 export const BudgetModel = model<IBudgetModel>('Budget', schema);
+
+schema.post('remove', async function(err, doc, next) {
+  if (err) throw err;
+  const budgetId = doc._id;
+  await BudgetModel.updateMany({ budget: budgetId }, { budget: null });
+  next();
+});

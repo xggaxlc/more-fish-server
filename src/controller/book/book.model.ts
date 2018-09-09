@@ -1,3 +1,5 @@
+import { BillModel } from './../bill/bill.model';
+import { BudgetModel } from './../budget/budget.model';
 import { model, Schema, Document } from 'mongoose';
 import { IUserModel } from './../user/user.model';
 const ObjectId = Schema.Types.ObjectId;
@@ -23,3 +25,13 @@ const schema = new Schema({
 });
 
 export const BookModel = model<IBookModel>('Book', schema);
+
+schema.post('remove', async function(err, doc, next) {
+  if (err) throw err;
+  const bookId = doc._id;
+  await Promise.all([
+    BudgetModel.remove({ book: bookId }),
+    BillModel.remove({ book: bookId })
+  ]);
+  next();
+});
