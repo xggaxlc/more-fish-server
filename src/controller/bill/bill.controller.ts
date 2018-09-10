@@ -2,10 +2,20 @@ import { pick } from 'lodash';
 import { BillModel } from './bill.model';
 import { IRouterCtx } from '../../interface/IRouterCtx';
 import { responseSuccess, throwNotFound, getPaginationMeta } from '../../utils/handle-response';
+import * as moment from 'moment';
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const query = { book: bookId };
+  const startAtDefault = moment().startOf('month').toDate();
+  const endAtDefault = moment().endOf('month').toDate();
+  const { start_at, end_at } = ctx.query;
+  const startAt = start_at ? moment(start_at).toDate() : startAtDefault;
+  const endAt = end_at ? moment(end_at).toDate() : endAtDefault;
+  const query = {
+    book: bookId,
+    time: { $gte:startAt, $lte: endAt }
+  };
+
   const { limit, skip } = ctx.pagination;
   const [data, count] = await Promise.all([
     BillModel

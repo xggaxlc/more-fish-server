@@ -6,11 +6,11 @@ import { responseSuccess } from '../../utils/handle-response';
 
 export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const startAtDefault = moment().startOf('month');
-  const endAtDefault = moment().endOf('month');
-  const { start_at = startAtDefault, end_at = endAtDefault } = ctx.query;
-  const startAt = moment(start_at).toDate();
-  const endAt = moment(end_at).toDate();
+  const startAtDefault = moment().startOf('month').toDate();
+  const endAtDefault = moment().endOf('month').toDate();
+  const { start_at, end_at } = ctx.query;
+  const startAt = start_at ? moment(start_at).toDate() : startAtDefault;
+  const endAt = end_at ? moment(end_at).toDate() : endAtDefault;
 
   const query = {
     book: new ObjectId(bookId),
@@ -23,15 +23,15 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
       $match: query,
     },
     {
-      $sort: { time: 1 },
-    },
-    {
       $group: {
         _id: { year: { $year: date }, month: { $month: date }, date: { $dayOfMonth: date } },
         amount: { $sum: '$amount' },
         count: { $sum: 1 }
       }
-    }
+    },
+    {
+      $sort: { '_id.date': -1 },
+    },
   ]);
 
   responseSuccess(ctx, { data });
