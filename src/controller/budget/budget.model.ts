@@ -1,4 +1,3 @@
-// 预算
 import { model, Schema, Document } from 'mongoose';
 import { IBookModel } from '../book/book.model';
 const ObjectId = Schema.Types.ObjectId;
@@ -28,10 +27,3 @@ const schema = new Schema({
 });
 
 export const BudgetModel = model<IBudgetModel>('Budget', schema);
-
-schema.post('remove', async function(err, doc, next) {
-  if (err) throw err;
-  const budgetId = doc._id;
-  await BudgetModel.updateMany({ budget: budgetId }, { budget: null });
-  next();
-});

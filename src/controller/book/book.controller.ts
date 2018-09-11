@@ -1,3 +1,5 @@
+import { BillModel } from './../bill/bill.model';
+import { BudgetModel } from './../budget/budget.model';
 import { IUserModel } from '../user/user.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
 import { BookModel } from './book.model';
@@ -105,4 +107,10 @@ export async function destroy(ctx: IRouterCtx) {
   const book = ctx.book;
   await book.remove();
   responseSuccess(ctx, {}, 204);
+
+  const bookId = book._id;
+  Promise.all([
+    BudgetModel.remove({ book: bookId }),
+    BillModel.remove({ book: bookId })
+  ]);
 }

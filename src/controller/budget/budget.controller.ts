@@ -1,3 +1,4 @@
+import { BillModel } from './../bill/bill.model';
 import { pick } from 'lodash';
 import { BudgetModel, IBudgetModel } from './budget.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
@@ -82,4 +83,5 @@ export async function destroy(ctx: IRouterCtx) {
     throwNotFound();
   }
   responseSuccess(ctx, {}, 204);
+  BillModel.updateMany({ budget: id }, { budget: null });
 }
