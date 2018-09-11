@@ -78,5 +78,5 @@ export async function destroy(ctx: IRouterCtx) {
   if (!data) {
     throwNotFound();
   }
-  responseSuccess(ctx, {}, 204);
+  responseSuccess(ctx);
 }

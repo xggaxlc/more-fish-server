@@ -106,7 +106,7 @@ export async function deleteUser(ctx: IRouterCtx) {
 export async function destroy(ctx: IRouterCtx) {
   const book = ctx.book;
   await book.remove();
-  responseSuccess(ctx, {}, 204);
+  responseSuccess(ctx);
 
   const bookId = book._id;
   Promise.all([
