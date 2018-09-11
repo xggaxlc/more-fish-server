@@ -5,7 +5,7 @@ import { config } from './config';
 import router from './router';
 import * as moment from 'moment-timezone';
 
-moment.locale('zh');
+moment.locale('zh-cn');
 moment.tz.setDefault('Asia/Shanghai');
 
 export const app = new Koa();
