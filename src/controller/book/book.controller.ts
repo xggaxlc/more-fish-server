@@ -89,24 +89,15 @@ export async function join(ctx: IRouterCtx) {
   responseSuccess(ctx, { data: Object.assign({}, book.toObject(), updateBody) });
 }
 
-export async function deleteUser(ctx: IRouterCtx) {
+export async function exit(ctx: IRouterCtx) {
   const book = ctx.book;
-  const userId = String(ctx.user.id);
+  const deleteUserId = String(ctx.user.id);
   const creatorId = String((book.create_user as IUserModel)._id);
-  const deleteUserId = String((ctx.request.body as any).id);
-  if (userId === creatorId) {
-    // 创建者
-    // 不能删除自己
-    if (deleteUserId === userId) {
-      throwCommonError('创建者不能退出账本，请删除账本');
-    }
-  } else {
-    // 非创建者
-    // 不能删除除自己以外的人
-    if (deleteUserId !== userId) {
-      throwForbidden();
-    }
+
+  if (creatorId === deleteUserId) {
+    throwCommonError('创建者无法退出账本，请删除账本');
   }
+
   const userIds = (book.users as IUserModel[]).map(userObj => userObj._id);
   const deleteUserIndex = userIds.findIndex(userId => String(userId) === deleteUserId);
   userIds.splice(deleteUserIndex, 1);

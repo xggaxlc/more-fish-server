@@ -27,7 +27,7 @@ export default (app: Koa) => {
   router.put('/books/:bookId', checkLogin, checkUserInBook, checkUserIsBookCreator, bookController.update);
   router.delete('/books/:bookId', checkLogin, checkUserInBook, checkUserIsBookCreator, bookController.destroy);
   router.put('/books/:bookId/join', checkLogin, bookController.join);
-  router.put('/books/:id/deleteUser', checkLogin, checkUserInBook, bookController.deleteUser);
+  router.put('/books/:bookId/exit', checkLogin, checkUserInBook, bookController.exit);
 
   router.get('/books/:bookId/budgets', checkLogin, checkUserInBook, budgetController.index);
   router.get('/books/:bookId/budgets/:id', checkLogin, checkUserInBook, budgetController.show);
