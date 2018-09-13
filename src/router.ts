@@ -22,12 +22,11 @@ export default (app: Koa) => {
   router.post('/users/login', userController.login);
 
   router.get('/books', checkLogin, pagination, bookController.index);
-  router.get('/books/:bookId', checkLogin, checkUserInBook, bookController.show);
+  router.get('/books/:bookId', checkLogin, bookController.show);
   router.post('/books', checkLogin, bookController.create);
   router.put('/books/:bookId', checkLogin, checkUserInBook, checkUserIsBookCreator, bookController.update);
   router.delete('/books/:bookId', checkLogin, checkUserInBook, checkUserIsBookCreator, bookController.destroy);
   router.put('/books/:bookId/join', checkLogin, bookController.join);
-  router.get('/books/:bookId/join', checkLogin, bookController.getJoin);
   router.put('/books/:id/deleteUser', checkLogin, checkUserInBook, bookController.deleteUser);
 
   router.get('/books/:bookId/budgets', checkLogin, checkUserInBook, budgetController.index);

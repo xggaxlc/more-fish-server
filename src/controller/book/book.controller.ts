@@ -3,7 +3,7 @@ import { BudgetModel } from './../budget/budget.model';
 import { IUserModel } from '../user/user.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
 import { BookModel } from './book.model';
-import { pick } from 'lodash';
+import { pick, flatten, isArray } from 'lodash';
 import { getPaginationMeta, responseSuccess, throwCommonError, throwForbidden, throwNotFound } from '../../utils/handle-response';
 
 export async function index(ctx: IRouterCtx) {
@@ -24,7 +24,27 @@ export async function index(ctx: IRouterCtx) {
 }
 
 export async function show(ctx: IRouterCtx) {
-  responseSuccess(ctx, { data: ctx.book });
+  const { id: userId } = ctx.user;
+  const { bookId } = ctx.params;
+  const data = await BookModel
+    .findById(bookId)
+    .populate({ path: 'users' })
+    .populate({ path: 'create_user' })
+    .exec();
+
+  if (!data) {
+    throwNotFound();
+  }
+
+  const book = data.toObject();
+  const users = book.users as IUserModel[];
+  const userIsMember = !!users.find(userObj => String(userObj._id) === String(userId));
+
+  if (!userIsMember) {
+    book.users = users.map(user => pick(user, ['avatarUrl', 'nickName', '_id'])) as any;
+    book.create_user = pick(book.create_user, ['avatarUrl', 'nickName', '_id']) as any;
+  }
+  return responseSuccess(ctx, { data: book });
 }
 
 export async function create(ctx: IRouterCtx) {
@@ -34,28 +54,20 @@ export async function create(ctx: IRouterCtx) {
   const users = [id];
   const body = { name, remark, create_user, users };
   const book = await new BookModel(body).save();
-  responseSuccess(ctx, { data: book });
+  responseSuccess(ctx, { data: book }, 201);
 }
 
 export async function update(ctx: IRouterCtx) {
+  const { id: userId } = ctx.user;
   const book = ctx.book;
-  const updateBody = pick(ctx.request.body, ['name', 'remark', 'users']);
+  const updateBody: any = pick(ctx.request.body, ['name', 'remark', 'users']);
+  // 不可以删除自己
+  if (isArray(updateBody.users)) {
+    (updateBody.users as Array<any>).unshift(userId);
+    updateBody.users = flatten(updateBody.users);
+  }
   await book.update(updateBody).exec();
   responseSuccess(ctx, { data: Object.assign({}, book.toObject(), updateBody) });
-}
-
-export async function getJoin(ctx: IRouterCtx) {
-  const { bookId } = ctx.params;
-  const data = await BookModel
-    .findById(bookId)
-    .populate({ path: 'users', select: ['avatarUrl', 'nickName', '_id'] })
-    .populate({ path: 'create_user', select: ['avatarUrl', 'nickName', '_id'] })
-    .exec();
-
-  if (!data) {
-    throwNotFound();
-  }
-  responseSuccess(ctx, { data });
 }
 
 export async function join(ctx: IRouterCtx) {
