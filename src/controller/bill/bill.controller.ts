@@ -6,15 +6,24 @@ import * as moment from 'moment';
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const startAtDefault = moment().startOf('month').toDate();
-  const endAtDefault = moment().endOf('month').toDate();
-  const { start_at, end_at } = ctx.query;
-  const startAt = start_at ? moment(start_at).toDate() : startAtDefault;
-  const endAt = end_at ? moment(end_at).toDate() : endAtDefault;
-  const query = {
+  const {
+    budget,
+    year = moment().get('year'),
+    month = moment().get('month')
+  } = ctx.query;
+
+  const $time = moment().set('year', year).set('month', month);
+  const $startAt = $time.startOf('month');
+  const $endAt = $time.endOf('month');
+
+  const query: { [key: string]: any } = {
     book: bookId,
-    time: { $gte:startAt, $lte: endAt }
+    time: { $gte: $startAt.toDate(), $lte: $endAt.toDate() }
   };
+
+  if (budget) {
+    query.budget = budget;
+  }
 
   const { limit, skip } = ctx.pagination;
   const [data, count] = await Promise.all([

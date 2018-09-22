@@ -42,6 +42,7 @@ export default (app: Koa) => {
   router.delete('/books/:bookId/bills/:id', checkLogin, checkUserInBook, billController.destroy);
 
   router.get('/books/:bookId/stat/getAmountGroupByDay', checkLogin, checkUserInBook, statController.getAmountGroupByDay);
+  router.get('/books/:bookId/stat/getAmountGroupByBudgetName', checkLogin, checkUserInBook, statController.getAmountGroupByBudgetName);
 
   app
     .use(handleError)
