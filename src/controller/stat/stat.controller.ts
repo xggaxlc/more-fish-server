@@ -8,6 +8,7 @@ import { config } from '../../config';
 export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
   const {
+    budget,
     year = moment().get('year'),
     month = moment().get('month')
   } = ctx.query;
@@ -24,6 +25,11 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
     // TODO 验证ObjectId
     book: new ObjectId(bookId),
     time: { $gte: $startAt.toDate(), $lte: $endAt.toDate() }
+  }
+
+  if (budget) {
+    // TODO 验证ObjectId
+    query.budget = new ObjectId(budget)
   }
 
   const date = { date: "$time", timezone: config.tz };
