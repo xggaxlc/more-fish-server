@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { ObjectId } from 'mongodb';
 import { BillModel } from '../bill/bill.model';
 import { responseSuccess } from '../../utils/handle-response';
+import { config } from '../../config';
 
 export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
@@ -17,7 +18,7 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
     time: { $gte: startAt, $lte: endAt }
   }
 
-  const date =  { date: "$time", timezone: '+0800' };
+  const date =  { date: "$time", timezone: config.tz };
   const data = await BillModel.aggregate([
     {
       $match: query,
@@ -34,5 +35,12 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
     },
   ]);
 
-  responseSuccess(ctx, { data });
+  const formatedData = data.map(item => {
+    return {
+      ...item,
+      amount: +((+item.amount || 0).toFixed(2))
+    }
+  });
+
+  responseSuccess(ctx, { data: formatedData });
 }
