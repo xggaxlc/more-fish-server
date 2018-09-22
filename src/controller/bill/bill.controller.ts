@@ -13,8 +13,8 @@ export async function index(ctx: IRouterCtx) {
   } = ctx.query;
 
   const $time = moment().set('year', year).set('month', month);
-  const $startAt = $time.startOf('month');
-  const $endAt = $time.endOf('month');
+  const $startAt = $time.clone().startOf('month');
+  const $endAt = $time.clone().endOf('month');
 
   const query: { [key: string]: any } = {
     book: bookId,

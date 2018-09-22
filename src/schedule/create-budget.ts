@@ -11,10 +11,10 @@ async function createBudgetSchedule() {
     const budgets = await queryBudget(bookId);
     const budget = budgets[0];
     if (!budget) {
-      const lastMonth = moment().startOf('month').add(-1, 'days');
-      const startAt = lastMonth.startOf('month').toDate();
-      const endAt = lastMonth.endOf('month').toDate();
-      const lastMonthBudgets = await queryBudget(bookId, startAt, endAt);
+      const $lastMonth = moment().startOf('month').add(-1, 'days');
+      const year = $lastMonth.clone().get('year');
+      const month = $lastMonth.clone().get('month');
+      const lastMonthBudgets = await queryBudget(bookId, year, month);
       const lastMonthBudget = lastMonthBudgets[0];
       lastMonthBudget && createBudget(bookId, lastMonthBudget.toObject());
     }

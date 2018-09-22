@@ -13,8 +13,8 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
   } = ctx.query;
 
   const $time = moment().set('year', year).set('month', month);
-  const $startAt = $time.startOf('month');
-  const $endAt = $time.endOf('month');
+  const $startAt = $time.clone().startOf('month');
+  const $endAt = $time.clone().endOf('month');
 
   if (!($startAt.isValid() && $endAt.isValid())) {
     throwCommonError('year 或者 month 格式不对');
@@ -55,8 +55,8 @@ export async function getAmountGroupByBudgetName(ctx: IRouterCtx) {
   }
 
   const $time = moment().set(type, value);
-  const $startAt = $time.startOf(type);
-  const $endAt = $time.endOf(type);
+  const $startAt = $time.clone().startOf(type);
+  const $endAt = $time.clone().endOf(type);
 
   if (!($startAt.isValid() && $endAt.isValid())) {
     throwCommonError('value 格式不对');
