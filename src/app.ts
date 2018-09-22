@@ -5,8 +5,8 @@ import { config } from './config';
 import router from './router';
 import * as moment from 'moment-timezone';
 
-moment.locale('zh-cn');
-moment.tz.setDefault('Asia/Shanghai');
+moment.locale(config.locale);
+moment.tz.setDefault(config.tz);
 
 export const app = new Koa();
 app.use(cors());
@@ -27,3 +27,4 @@ async function startServer() {
 
 router(app);
 startServer();
+require('./schedule/create-budget');

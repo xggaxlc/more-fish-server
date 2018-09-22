@@ -5,7 +5,11 @@ import { IRouterCtx } from './../../interface/IRouterCtx';
 import { responseSuccess, throwNotFound } from '../../utils/handle-response';
 import * as moment from 'moment';
 
-function queryBudget(bookId: string, start_at: Date, end_at: Date) {
+export function queryBudget(
+  bookId: string,
+  start_at: Date = moment().startOf('month').toDate(),
+  end_at: Date = moment().endOf('month').toDate()
+) {
   const query = {
     book: bookId,
     start_at,
@@ -16,7 +20,7 @@ function queryBudget(bookId: string, start_at: Date, end_at: Date) {
     .exec();
 }
 
-function createBudget(bookId: string, createBody: IBudgetModel) {
+export function createBudget(bookId: string, createBody: IBudgetModel) {
   const body: IBudgetModel = pick(createBody, ['name', 'remark', 'amount', 'color']) as IBudgetModel;
   body.book = bookId;
   body.start_at = moment().startOf('month').toDate();
@@ -26,24 +30,8 @@ function createBudget(bookId: string, createBody: IBudgetModel) {
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const data = await queryBudget(
-    bookId,
-    moment().startOf('month').toDate(),
-    moment().endOf('month').toDate()
-  );
-
-  if (data.length) {
-    responseSuccess(ctx, { data });
-  } else {
-    const lastMonth = moment().startOf('month').add(-1, 'days');
-    const lastMonthData = await queryBudget(
-      bookId,
-      lastMonth.startOf('month').toDate(),
-      lastMonth.endOf('month').toDate()
-    );
-    const createdData = await Promise.all(lastMonthData.map(item => createBudget(bookId, item)));
-    responseSuccess(ctx, { data: createdData });
-  }
+  const data = await queryBudget(bookId);
+  responseSuccess(ctx, { data });
 }
 
 export async function show(ctx: IRouterCtx) {

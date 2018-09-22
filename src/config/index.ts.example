@@ -18,5 +18,7 @@ export const config: IConfig = merge({
   jwtExpires: '7d',
   pagination: {
     limit: 20
-  }
+  },
+  locale: 'zh-cn',
+  tz: 'Asia/Shanghai'
 }, require(`./${NODE_ENV}.js`).default);

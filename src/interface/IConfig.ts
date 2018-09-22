@@ -14,5 +14,7 @@ export interface IConfig {
   jwtExpires: string;
   pagination: {
     limit: number;
-  }
+  },
+  tz: string;
+  locale: string;
 }
