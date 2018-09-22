@@ -25,6 +25,12 @@ async function startServer() {
   app.listen(config.port, () => console.log(`Server running on port ${config.port}`));
 }
 
+function runSchedule() {
+  if (!(+process.env.NODE_APP_INSTANCE)) {
+    require('./schedule/create-budget');
+  }
+}
+
 router(app);
 startServer();
-require('./schedule/create-budget');
+runSchedule();
