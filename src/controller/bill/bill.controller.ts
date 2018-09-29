@@ -8,13 +8,12 @@ export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
   const {
     budget,
-    year = moment().get('year'),
-    month = moment().get('month')
+    start_at = moment().startOf('month'),
+    end_at = moment().endOf('month')
   } = ctx.query;
 
-  const $time = moment().set('year', year).set('month', month);
-  const $startAt = $time.clone().startOf('month');
-  const $endAt = $time.clone().endOf('month');
+  const $startAt = moment(start_at);
+  const $endAt = moment(end_at);
 
   const query: { [key: string]: any } = {
     book: bookId,

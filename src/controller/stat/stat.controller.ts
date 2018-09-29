@@ -9,13 +9,12 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
   const {
     budget,
-    year = moment().get('year'),
-    month = moment().get('month')
+    start_at = moment().startOf('month'),
+    end_at = moment().endOf('month')
   } = ctx.query;
 
-  const $time = moment().set('year', year).set('month', month);
-  const $startAt = $time.clone().startOf('month');
-  const $endAt = $time.clone().endOf('month');
+  const $startAt = moment(start_at);
+  const $endAt = moment(end_at);
 
   if (!($startAt.isValid() && $endAt.isValid())) {
     throwCommonError('year 或者 month 格式不对');

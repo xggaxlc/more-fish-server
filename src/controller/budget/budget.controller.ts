@@ -7,19 +7,19 @@ import * as moment from 'moment';
 
 export function queryBudget(
   bookId: string,
-  year = moment().get('year'),
-  month = moment().get('month')
+  start_at = moment().startOf('month'),
+  end_at = moment().endOf('month')
 ) {
 
-  const $time = moment().set('year', year).set('month', month);
-  const $startAt = $time.clone().startOf('month');
-  const $endAt = $time.clone().endOf('month');
+  const $startAt = moment(start_at);
+  const $endAt = moment(end_at);
 
   const query = {
     book: bookId,
-    start_at: $startAt.toDate(),
-    end_at: $endAt.toDate()
+    start_at: { $gte: $startAt.toDate() },
+    end_at: { $lte: $endAt.toDate() }
   }
+
   return BudgetModel
     .find(query)
     .exec();
@@ -35,9 +35,9 @@ export function createBudget(bookId: string, createBody: IBudgetModel) {
 
 export async function index(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const { year, month } = ctx.query;
+  const { start_at, end_at } = ctx.query;
 
-  const data = await queryBudget(bookId, year, month);
+  const data = await queryBudget(bookId, start_at, end_at);
   responseSuccess(ctx, { data });
 }
 
