@@ -8,18 +8,13 @@ async function createBudgetSchedule() {
   const books = await BookModel.find({}).exec();
   books.forEach(async(book) => {
     const bookId = book._id;
-    const budgets = await queryBudget(bookId);
-    const budget = budgets[0];
-    if (!budget) {
-      const $lastMonth = moment().startOf('month').add(-1, 'days');
-      const lastMonthBudgets = await queryBudget(bookId, moment($lastMonth).startOf('month'), moment($lastMonth).endOf('month'));
-      const lastMonthBudget = lastMonthBudgets[0];
-      lastMonthBudget && createBudget(bookId, lastMonthBudget.toObject());
-    }
+    const $lastMonth = moment().startOf('month').add(-1, 'days');
+    const lastMonthBudgets = await queryBudget(bookId, moment($lastMonth).startOf('month'), moment($lastMonth).endOf('month'));
+    lastMonthBudgets.forEach(lastMonthBudget => createBudget(bookId, lastMonthBudget.toObject()));
   });
 }
 
 const scheduleJob = schedule.scheduleJob as any;
 const tz = config.tz;
-const rule = { date: 1, hour: 0, minute: 0, second: 10 };
+const rule = { date: 1, hour: 0, minute: 0, second: 1 };
 scheduleJob({ tz, rule }, createBudgetSchedule);
