@@ -1,9 +1,11 @@
+import { BudgetModel } from './../budget/budget.model';
 import { IRouterCtx } from './../../interface/IRouterCtx';
 import * as moment from 'moment';
 import { ObjectId } from 'mongodb';
 import { BillModel } from '../bill/bill.model';
 import { responseSuccess, throwCommonError } from '../../utils/handle-response';
 import { config } from '../../config';
+import * as _ from 'lodash';
 
 export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
@@ -65,53 +67,62 @@ export async function getAmountGroupByBudgetName(ctx: IRouterCtx) {
     throwCommonError('start_at end_at 格式不对');
   }
 
-  const query = {
+  const billQuery = {
     book: new ObjectId(bookId),
     time: { $gte: $startAt.toDate(), $lte: $endAt.toDate() }
   }
-  const data = await BillModel.aggregate([
-    {
-      $match: query
-    },
-    {
-      $group: {
-        _id: '$budget',
-        amount: { $sum: '$amount' },
-      }
-    },
-    {
-      $lookup: {
-        from: 'budgets',
-        localField: '_id',
-        foreignField: '_id',
-        as: 'budget_docs',
-      }
-    },
-    {
-      $replaceRoot: {
-        newRoot: {
-          $mergeObjects: [
-            {
-              budget_doc: {
-                $arrayElemAt: ['$budget_docs', 0]
-              }
-            },
-            '$$ROOT'
-          ]
+
+  const budgetQuery = {
+    book: new ObjectId(bookId),
+    start_at: { $gte: $startAt.toDate() },
+    end_at: { $lte: $endAt.toDate() }
+  }
+
+  const [budgets, billDataGroupByBudgetId] = await Promise.all([
+    BudgetModel.find(budgetQuery).exec(),
+    BillModel.aggregate([
+      {
+        $match: billQuery
+      },
+      {
+        $group: {
+          _id: '$budget',
+          amount: { $sum: '$amount' },
         }
       }
-    },
-    {
-      $group: {
-        _id: '$budget_doc.name',
-        color: { $last: '$budget_doc.color' },
-        amount: { $sum: '$amount' },
-        budget_amount: { $sum: '$budget_doc.amount' }
-      },
-    },
-    {
-      $sort: { 'amount': -1 }
-    }
+    ]).exec()
   ]);
-  responseSuccess(ctx, { data });
+
+  const budgetDataGroupByBudgetsId = budgets.map(budget => {
+    return {
+     ...budget.toObject(),
+      bill_amount: _.get(billDataGroupByBudgetId.find((item: any) => String(item._id) === String(budget._id)), 'amount', 0)
+    }
+  });
+
+  const names = _.uniq(budgets.map(item => item.name));
+
+  const data = names.map(name => {
+    const budgets = budgetDataGroupByBudgetsId.filter(item => item.name === name);
+    return {
+      _id: name,
+      color: _.get(_.last(budgets), 'color', '#666'),
+      amount: _.sumBy(budgets, 'bill_amount'),
+      budget_amount: _.sumBy(budgets, 'amount')
+    }
+  });
+
+  const noBudgetData = billDataGroupByBudgetId.find((item: any) => !item._id);
+  if (noBudgetData) {
+    data.push({
+      _id: '未知',
+      color: '#666',
+      amount: noBudgetData.amount,
+      budget_amount: 0
+    });
+  }
+
+  const sortedData = data.sort((a, b) => b.amount - a.amount);
+
+  responseSuccess(ctx, { data: sortedData });
 }
