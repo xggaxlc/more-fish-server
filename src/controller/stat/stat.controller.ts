@@ -74,9 +74,15 @@ export async function getAmountGroupByBudgetName(ctx: IRouterCtx) {
       $match: query
     },
     {
+      $group: {
+        _id: '$budget',
+        amount: { $sum: '$amount' },
+      }
+    },
+    {
       $lookup: {
         from: 'budgets',
-        localField: 'budget',
+        localField: '_id',
         foreignField: '_id',
         as: 'budget_docs',
       }
@@ -99,10 +105,9 @@ export async function getAmountGroupByBudgetName(ctx: IRouterCtx) {
       $group: {
         _id: '$budget_doc.name',
         color: { $last: '$budget_doc.color' },
-        budget_amount: { $sum: '$budget_doc.amount' },
         amount: { $sum: '$amount' },
-        count: { $sum: 1 }
-      }
+        budget_amount: { $sum: '$budget_doc.amount' }
+      },
     },
     {
       $sort: { 'amount': -1 }
