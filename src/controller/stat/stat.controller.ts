@@ -17,7 +17,7 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
   const $endAt = moment(end_at);
 
   if (!($startAt.isValid() && $endAt.isValid())) {
-    throwCommonError('year 或者 month 格式不对');
+    throwCommonError('start_at end_at 格式不对');
   }
 
   const query: { [key: string]: any } = {
@@ -53,18 +53,16 @@ export async function getAmountGroupByDay(ctx: IRouterCtx) {
 
 export async function getAmountGroupByBudgetName(ctx: IRouterCtx) {
   const { bookId } = ctx.params;
-  const { type = 'month', value = moment().get('month') } = ctx.query;
+  const {
+    start_at = moment().startOf('month'),
+    end_at = moment().endOf('month')
+   } = ctx.query;
 
-  if (['month', 'year'].indexOf(type) === -1) {
-    throwCommonError('type 格式不对');
-  }
-
-  const $time = moment().set(type, value);
-  const $startAt = $time.clone().startOf(type);
-  const $endAt = $time.clone().endOf(type);
+  const $startAt = moment(start_at);
+  const $endAt = moment(end_at);
 
   if (!($startAt.isValid() && $endAt.isValid())) {
-    throwCommonError('value 格式不对');
+    throwCommonError('start_at end_at 格式不对');
   }
 
   const query = {
