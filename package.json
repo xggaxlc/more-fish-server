@@ -12,7 +12,7 @@
   "dependencies": {
     "@koa/cors": "^2.2.2",
     "autobind-decorator": "^2.1.0",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "koa": "^2.5.2",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
